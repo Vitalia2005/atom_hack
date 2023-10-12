@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Построить маршрут</title>
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=bea8cc62-9f96-4fcb-ab91-db4c9dd35c95&lang=ru_RU"
+            type="text/javascript"></script>
+</head>
+<body>
+<h1>Построение пешеходного маршрута</h1>
+
+<!-- Карта будет отображаться здесь -->
+<div id="map1" style="width: 800px; height: 400px;"></div>
+
+<!-- Введите адрес точки назначения -->
+<input type="text" id="destination" placeholder="Введите адрес точки назначения">
+<button onclick="calculateRoute()">Построить маршрут</button>
+
+<div id="route-details"></div>
+
+<script>
+    ymaps.ready(init);
+
+    function init() {
+        var myMap = new ymaps.Map("map1", {
+            center: [55.755773, 37.617761],
+            zoom: 10
+        });
+
+        var control = new ymaps.control.RoutePanel({
+        options: {
+            autofocus: true,
+            reverseGeocoding: true
+        }
+    });
+
+    // Устанавливаем ограничение на тип маршрута - только "пешеход".
+    control.routePanel.options.set({
+        types: { pedestrian: true },
+    });
+        myMap.controls.add(control);
+
+        control.routePanel.state.set({
+            from: "Москва, Ленинградский проспект, 1",
+            to: "Москва, Красная площадь"
+        });
+
+        control.routePanel.getRouteAsync().then(function (route) {
+            var routes = route.getActiveRoute();
+            if (routes) {
+                var distance = routes.properties.get("distance.text");
+                var duration = routes.properties.get("duration.text");
+                var routeText = "Длина маршрута: " + distance + "<br>Время в пути: " + duration;
+                document.getElementById("route-info").innerHTML = routeText;
+            }
+        });
+    }
+
+</script>
+<h1>Построение маршрута электромобиля </h1> <h2> Введите начальный и конечный адрес, а также текущий заряд автомобиля в квт*ч</h2>
+<!-- Добавляем поле для заряда электромобиля -->
+<input type="number" id="charge" placeholder="Заряд электромобиля (квт в час, max = 77)">
+<input type="text" id="start_address" placeholder="Начальный адрес">
+<input type="text" id="end_address" placeholder="Конечный адрес">
+<button onclick="buildRoute()">Построить маршрут на электромобиле</button>
+<div id="map" style="width: 600px; height: 400px;"></div>
+</body>
+<script src="../static/geocode.js">
+</script>
+</html>
